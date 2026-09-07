@@ -1,0 +1,1 @@
+"""Go game engine package: board, rules, scoring, state."""

@@ -1,0 +1,1 @@
+"""Go game directory: ai, games, ui, tests."""
