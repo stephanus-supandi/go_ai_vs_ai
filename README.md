@@ -54,6 +54,7 @@ In other words:
 
 ## Architecture
 
+```text
 go_ai_vs_ai/
 │
 ├── main.py
@@ -83,8 +84,11 @@ go_ai_vs_ai/
     ├── test_rules.py
     ├── test_mcts.py
     └── __init__.py
+```
 
 The important separation is:
+
+```text
              ┌─────────────┐
              │     UI      │
              └──────┬──────┘
@@ -98,19 +102,20 @@ The important separation is:
              │  GameState  │
              └──────┬──────┘
                     │
-          ┌─────────┴─────────┐
-          │                   │
-     ┌────▼────┐        ┌─────▼─────┐
-     │  Rules  │        │  Scoring  │
-     └────┬────┘        └───────────┘
-          │
-     ┌────▼────┐
-     │  Board  │
-     └─────────┘
+           ┌────────┴────────┐
+           │                 │
+      ┌────▼────┐      ┌─────▼─────┐
+      │  Rules  │      │  Scoring  │
+      └────┬────┘      └───────────┘
+           │
+      ┌────▼────┐
+      │  Board  │
+      └─────────┘
+```
 
 The game engine does not know or care which AI is playing.
 
-The AI ​​does not modify the UI.
+The AI does not modify the UI.
 
 The UI does not contain the game rules.
 
@@ -125,7 +130,7 @@ Boring is good.
 Board
 game/board.py
 
-The Boardclass handles low-level board operations:
+The The `Board` class handles low-level board operations:
 
 - board representation
 - coordinates
@@ -164,7 +169,7 @@ The rules layer handles move legality.
 - game termination
 
 Illegal moves raise:
-IllegalMoveError
+`IllegalMoveError`
 
 The engine does not silently convert an illegal move into a pass.
 If something is wrong, it should fail loudly.
@@ -173,8 +178,9 @@ That's useful when debugging an AI.
 ---
 
 ## Game State
-game/game_state.py
-GameStaterepresents the current game.
+
+`game/game_state.py`
+`GameState` represents the current game.
 
 It contains information such as:
 - current board
@@ -189,7 +195,7 @@ It contains information such as:
 The game state is mutable during normal play.
 
 For search algorithms, the state can be cloned:
-state.clone()
+`state.clone()`
 
 This is important for MCTS because simulations must not corrupt the real game.
 The real game stays outside the search tree.
@@ -325,6 +331,8 @@ Huge debugging potential.
 MCTS must be allowed to explore hypothetical games without destroying the actual game.
 
 Conceptually:
+
+```text
 REAL GAME STATE
        │
        ├── clone → simulation A
@@ -332,8 +340,9 @@ REAL GAME STATE
        ├── clone → simulation B
        │
        └── clone → simulation C
+```
 
-The supplied GameStateis never mutated by MCTSAI.choose_move().
+The supplied GameStateis never mutated by `MCTSAI.choose_move()`.
 
 This keeps the search isolated from the real game.
 
@@ -356,7 +365,9 @@ The current test suite covers:
 - AI-vs-AI game execution
 
 Run the complete suite with:
+```bat
 python -m unittest discover -s tests -t . -v
+```
 
 Current verified result:
 Ran 47 tests
@@ -370,7 +381,9 @@ Requirements
 Python 3.14 was used during development.
 
 Install dependencies:
+```bat
 python -m pip install -r requirements.txt
+```
 
 The GUI uses:
 pygame-ce
@@ -379,26 +392,42 @@ pygame-ce
 
 ## Headless Mode
 Run an AI-vs-AI game without the graphical interface:
-python main.py --headless
+```bat
+```bat
+python main.py
+``` --headless
+```
 
 For example:
-python main.py --headless --size 5 --black mcts --white random
+```bat
+```bat
+python main.py
+``` --headless
+``` --size 5 --black mcts --white random
 
 Available AI players:
 - random
 - mcts
 
 Example MCTS-vs-MCTS:
-python main.py --headless --size 5 --black mcts --white mcts
+```bat
+```bat
+python main.py
+``` --headless
+``` --size 5 --black mcts --white mcts
 
 ---
 
 ## GUI
 Launch the graphical version:
+```bat
 python main.py
+```
 
 Example:
-python main.py --size 5 --black mcts --white random
+```bat
+python main.py
+``` --size 5 --black mcts --white random
 
 The GUI provides:
 - board rendering
@@ -431,7 +460,7 @@ There is an interesting engineering problem here.
 
 Pure random play can produce cycles.
 
-The current rules implement simple ko , not full positional superko.
+The current rules implement simple ko, not full positional superko.
 
 Therefore, Random-vs-Random is not guaranteed to terminate naturally in every possible game.
 
@@ -454,7 +483,7 @@ The current project has:
 - Liberty calculation
 - Capture mechanics
 - Suicide prevention
-- It's simple
+- simple ko
 - Pass handling
 - Resignation
 - Game termination
@@ -531,6 +560,7 @@ A beautiful AI that violates the rules is still just a fancy bug generator.
 
 So the development order is intentionally boring:
 
+```text
 correctness
     ↓
 understanding
@@ -540,6 +570,7 @@ testing
 performance
     ↓
 intelligence
+```
 
 ---
 
@@ -547,6 +578,7 @@ intelligence
 This project is also an experiment in building computational systems from the bottom up.
 
 Instead of hiding everything behind a large framework:
+```text
 small primitive
       ↓
 explicit state
@@ -556,6 +588,7 @@ explicit rules
 explicit computation
       ↓
 observable behavior
+```
 
 The code should be understandable enough that when something goes wrong, we can actually find the damn thing.
 
